@@ -5,8 +5,10 @@
         <title>Главная страница</title>
     </head>
     <body>
-        <p>Learning Log</p>
+        {% extends "learning_logs/base.html" %}
 
-        <p>Learning Log helps eou keep track of your learning.</p>
+        {% block content %}
+        <p>Learning Log helps you keep track of your learning.</p>
+        {% endblock content %}
     </body>
 </html>
