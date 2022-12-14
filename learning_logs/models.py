@@ -6,6 +6,9 @@ class Topic(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
     # objects = models.Manager()
 
+    class Meta:
+        ordering = ['text', 'date_added']
+
     def __str__(self):
         """Возвращает строковое представление модели"""
         return self.text
@@ -18,6 +21,7 @@ class Entry(models.Model):
 
     class Meta:
         verbose_name_plural = 'entreis'
+        ordering = ['text', 'date_added']
 
     def __str__(self):
         """Возвращает строковое представление модели"""
