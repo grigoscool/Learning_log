@@ -17,7 +17,7 @@ def topic(request, topic_id):
     """Выводит одну тему и все ее записи"""
     topic = Topic.objects.get(id=topic_id)
     entries = topic.entry_set.order_by('-date_added')
-    content = {'topics': topics, 'entries': entries}
+    content = {'topic': topic, 'entries': entries}
     return render(request, 'learning_logs/topic.html', content)
 
 def new_topic(request):
