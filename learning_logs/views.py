@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 
-from .models import Topic
+from .models import Topic, Entry
 from .forms import TopicForm, EntryForm
 
 def index(reguest):
@@ -10,8 +10,8 @@ def index(reguest):
 def topics(request):
     """Выводит список тем"""
     topics = Topic.objects.order_by('date_added')   #запрос к БД на получение объектов Topic
-    content = {'topics': topics}
-    return render(request, 'learning_logs/topics.html', content)
+    context = {'topics': topics}
+    return render(request, 'learning_logs/topics.html', context)
 
 def topic(request, topic_id):
     """Выводит одну тему и все ее записи"""
@@ -48,3 +48,18 @@ def new_entry(request, topic_id):
             return redirect('learning_logs:topic', topic_id = topic_id)
     context = {'topic':topic, 'form':form}
     return render(request, 'learning_logs/new_entry.html', context)
+
+def edit_entry(request, entry_id):
+    entry = Entry.objects.get(id=entry_id)
+    topic = entry.topic
+    if request.method != 'POST':
+        # Данные не отправлялись, создается пустая форма
+        form = EntryForm(instance=entry)
+    else:
+        # Отправленные данные POST, обработать данные
+        form = EntryForm(instance=entry, data=request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('learning_logs:topic', topic_id=topic.id)
+    context = {'topic':topic, 'entry': entry, 'form': form}
+    return render(request, 'learning_logs/edit_entry.html', context)
