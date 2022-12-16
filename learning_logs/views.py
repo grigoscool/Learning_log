@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 
 from .models import Topic
-from .forms import TopicForm
+from .forms import TopicForm, EntryForm
 
 def index(reguest):
     """Домашняя страница приложения learning_logs"""
@@ -33,3 +33,18 @@ def new_topic(request):
             return redirect('learning_logs:topics')
     context = {'form': form}
     return render(request, 'learning_logs/new_topic.html', context)
+
+def new_entry(request, topic_id):
+    """Определяет новую запись"""
+    topic = Topic.objects.get(id=topic_id)
+    if request.method != "POST":
+        form = EntryForm()
+    else:
+        form = EntryForm(data=request.POST)
+        if form.is_valid():
+            last_entry = form.save(commit=False)
+            last_entry.topic = topic
+            last_entry.save()
+            return redirect('learning_logs:topic', topic_id = topic_id)
+    context = {'topic':topic, 'form':form}
+    return render(request, 'learning_logs/new_entry.html', context)
