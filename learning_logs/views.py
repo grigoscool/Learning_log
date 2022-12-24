@@ -11,7 +11,8 @@ def index(reguest):
 @login_required
 def topics(request):
     """Выводит список тем"""
-    topics = Topic.objects.order_by('date_added')   #запрос к БД на получение объектов Topic
+    # запрос к БД на получение объектов Topic но только request.user (связь с залогин пользователем)
+    topics = Topic.objects.filter(owner=request.user).order_by('date_added')
     context = {'topics': topics}
     return render(request, 'learning_logs/topics.html', context)
 
