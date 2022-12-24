@@ -1,8 +1,14 @@
 from django.contrib.auth.decorators import login_required
+from django.http import Http404
 from django.shortcuts import render, redirect
 
 from .models import Topic, Entry
 from .forms import TopicForm, EntryForm
+
+# рефакторинг
+def check_owner_topic(request):
+    if topic.owner != request.user:
+        raise Http404
 
 def index(reguest):
     """Домашняя страница приложения learning_logs"""
@@ -20,6 +26,9 @@ def topics(request):
 def topic(request, topic_id):
     """Выводит одну тему и все ее записи"""
     topic = Topic.objects.get(id=topic_id)
+    # проверка принадлежит ли тема к пользователю
+    check_owner_topic()
+
     entries = topic.entry_set.order_by('-date_added')
     content = {'topic': topic, 'entries': entries}
     return render(request, 'learning_logs/topic.html', content)
@@ -34,7 +43,11 @@ def new_topic(request):
         # Отправленные данные POST, обработать данные
         form = TopicForm(data=request.POST)
         if form.is_valid():
-            form.save()
+            # добавление владельца новой темы в столбец БД
+            new_topic = form.save(commit=False)
+            new_topic.owner = request.user
+            new_topic.save()
+
             return redirect('learning_logs:topics')
     context = {'form': form}
     return render(request, 'learning_logs/new_topic.html', context)
@@ -43,6 +56,9 @@ def new_topic(request):
 def new_entry(request, topic_id):
     """Определяет новую запись"""
     topic = Topic.objects.get(id=topic_id)
+    # проверка принадлежит ли тема к пользователю
+    check_owner_topic()
+
     if request.method != "POST":
         form = EntryForm()
     else:
