@@ -19,5 +19,6 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('learning_logs.urls')),    # добавляет к исходному домену \learning_logs\
+    path('users/', include('users.urls')),  # добавляет к исходному домену \users\
 
 ]
