@@ -6,7 +6,7 @@ from .models import Topic, Entry
 from .forms import TopicForm, EntryForm
 
 # рефакторинг
-def check_owner_topic(request):
+def check_owner_topic(request, topic):
     if topic.owner != request.user:
         raise Http404
 
@@ -27,7 +27,7 @@ def topic(request, topic_id):
     """Выводит одну тему и все ее записи"""
     topic = Topic.objects.get(id=topic_id)
     # проверка принадлежит ли тема к пользователю
-    check_owner_topic()
+    check_owner_topic(request, topic)
 
     entries = topic.entry_set.order_by('-date_added')
     content = {'topic': topic, 'entries': entries}
@@ -57,7 +57,7 @@ def new_entry(request, topic_id):
     """Определяет новую запись"""
     topic = Topic.objects.get(id=topic_id)
     # проверка принадлежит ли тема к пользователю
-    check_owner_topic()
+    check_owner_topic(request, topic)
 
     if request.method != "POST":
         form = EntryForm()
