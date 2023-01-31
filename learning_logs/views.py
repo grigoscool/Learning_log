@@ -5,14 +5,17 @@ from django.shortcuts import render, redirect
 from .models import Topic, Entry
 from .forms import TopicForm, EntryForm
 
+
 # рефакторинг
 def check_owner_topic(request, topic):
     if topic.owner != request.user:
         raise Http404
 
+
 def index(reguest):
     """Домашняя страница приложения learning_logs"""
     return render(reguest, 'learning_logs/index.html')  # функции представления
+
 
 @login_required
 def topics(request):
@@ -21,6 +24,7 @@ def topics(request):
     topics = Topic.objects.filter(owner=request.user).order_by('date_added')
     context = {'topics': topics}
     return render(request, 'learning_logs/topics.html', context)
+
 
 @login_required
 def topic(request, topic_id):
@@ -32,6 +36,7 @@ def topic(request, topic_id):
     entries = topic.entry_set.order_by('-date_added')
     content = {'topic': topic, 'entries': entries}
     return render(request, 'learning_logs/topic.html', content)
+
 
 @login_required
 def new_topic(request):
@@ -52,10 +57,11 @@ def new_topic(request):
     context = {'form': form}
     return render(request, 'learning_logs/new_topic.html', context)
 
+
 @login_required
-def new_entry(request, topic_id):
+def new_entry(request, entry_id):
     """Определяет новую запись"""
-    topic = Topic.objects.get(id=topic_id)
+    topic = Topic.objects.get(id=entry_id)
     # проверка принадлежит ли тема к пользователю
     check_owner_topic(request, topic)
 
@@ -68,9 +74,10 @@ def new_entry(request, topic_id):
             last_entry.topic = topic
             check_owner_topic()
             last_entry.save()
-            return redirect('learning_logs:topic', topic_id = topic_id)
-    context = {'topic':topic, 'form':form}
+            return redirect('learning_logs:topic', topic_id=topic_id)
+    context = {'topic': topic, 'form': form}
     return render(request, 'learning_logs/new_entry.html', context)
+
 
 @login_required
 def edit_entry(request, entry_id):
@@ -85,5 +92,5 @@ def edit_entry(request, entry_id):
         if form.is_valid():
             form.save()
             return redirect('learning_logs:topic', topic_id=topic.id)
-    context = {'topic':topic, 'entry': entry, 'form': form}
+    context = {'topic': topic, 'entry': entry, 'form': form}
     return render(request, 'learning_logs/edit_entry.html', context)
